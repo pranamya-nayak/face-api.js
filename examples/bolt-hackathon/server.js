@@ -15,8 +15,10 @@ app.use(express.static(path.join(__dirname, '../media')))
 app.use(express.static(path.join(__dirname, '../../weights')))
 app.use(express.static(path.join(__dirname, '../../dist')))
 
-app.get('/', (req, res) => res.redirect('/face_detection'))
-app.get('/face_detection', (req, res) => res.sendFile(path.join(viewsDir, 'webcamFaceLandmarkDetection.html')))
+app.get('/', (req, res) => res.redirect('/guest'))
+app.get('/face_detection', (req, res) => res.sendFile(path.join(viewsDir, 'guest.html')))
+app.get('/guest', (req, res) => res.sendFile(path.join(viewsDir, 'guest.html')))
+app.get('/loggedin', (req, res) => res.sendFile(path.join(viewsDir, 'loggedin.html')))
 app.post('/fetch_external_image', async (req, res) => {
   const { imageUrl } = req.body
   if (!imageUrl) {

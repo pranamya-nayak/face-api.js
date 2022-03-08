@@ -26,11 +26,19 @@ function renderNavBar(navbarId, exampleUri) {
   const examples = [
     {
       uri: 'face_detection',
-      name: 'Face Detection'
+      name: 'Bolt biometrics authenticator'
+    },
+    {
+      uri: 'guest',
+      name: 'Guest'
+    },
+    {
+      uri: 'loggedin',
+      name: 'Logged In'
     },
     {
       uri: 'webcam_face_landmark_detection',
-      name: 'Webcam Face Landmark Detection'
+      name: 'Misc'
     }
   ]
 

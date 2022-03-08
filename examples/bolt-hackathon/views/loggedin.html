@@ -124,9 +124,16 @@
     let forwardTimes = []
     let withBoxes = true
     let createProfile = true
-
+    var stream;
     $("#createProfile").click(function() {
        createProfile = false;
+
+       stream.getTracks().forEach(function(track) {
+        track.stop();
+      });
+
+       $("#overlay").hide();
+
     });
 
     function onChangeHideBoundingBoxes(e) {
@@ -181,7 +188,7 @@
 
       // try to access users webcam and stream the images
       // to the video element
-      const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
+      stream = await navigator.mediaDevices.getUserMedia({ video: {} })
       const videoEl = $('#inputVideo').get(0)
       videoEl.srcObject = stream
     }
@@ -189,7 +196,7 @@
     function updateResults() {}
 
     $(document).ready(function() {
-      renderNavBar('#navbar', 'webcam_face_landmark_detection')
+      renderNavBar('#navbar', 'loggedin')
       initFaceDetectionControls()
       run()
     })
