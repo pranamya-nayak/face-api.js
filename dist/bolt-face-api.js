@@ -338,7 +338,6 @@
      var jaw16_8 = getDistance( jaw8.x, jaw8.y, jaw16.x, jaw16.y);
      var jaw8_0 = getDistance(jaw8.x, jaw8.y, jaw0.x, jaw0.y);
      var jaw16_0 = getDistance(jaw16.x, jaw16.y, jaw0.x, jaw0.y);
-     // console.log("Distance 16_8 = " + jaw16_8 + " , jaw0_0 = ", jaw0_0);
 
      var mouthDistance = getDistance( mouthPoints[6].x, mouthPoints[6].y, 
                                         mouthPoints[0].x, mouthPoints[0].y);
@@ -348,12 +347,32 @@
      localStorage.setItem('profile',profile);
   }
 
+  function authenticate(jawPoints, mouthPoints, profile) {
+     var jaw16 = jawPoints[16];
+     var jaw8 = jawPoints[8];
+     var jaw0 = jawPoints[0];
+
+     var jaw16_8 = getDistance( jaw8.x, jaw8.y, jaw16.x, jaw16.y);
+     var jaw8_0 = getDistance(jaw8.x, jaw8.y, jaw0.x, jaw0.y);
+     var jaw16_0 = getDistance(jaw16.x, jaw16.y, jaw0.x, jaw0.y);
+
+     var mouthDistance = getDistance( mouthPoints[6].x, mouthPoints[6].y, 
+                                        mouthPoints[0].x, mouthPoints[0].y);
+
+     var t = parseInt(jaw16_8) + "~" + parseInt(jaw16_0) + "~" + parseInt(mouthDistance);
+     var present = profile.has(t);
+     if (present == true) {
+         localStorage["authenticated"] = true;
+         console.log("Hurray authenticated");
+     }
+  }
+
   function getDistance(x1, y1, x2, y2){
     let y = x2 - x1;
     let x = y2 - y1;
     
     return Math.sqrt(x * x + y * y);
-}
+  }
 
   /*! *****************************************************************************
   Copyright (c) Microsoft Corporation. All rights reserved.
@@ -2744,9 +2763,11 @@
       return DrawFaceLandmarksOptions;
   }());
   var DrawFaceLandmarks = /** @class */ (function () {
-      function DrawFaceLandmarks(faceLandmarks, options) {
+      function DrawFaceLandmarks(faceLandmarks, loggedin, options) {
           if (options === void 0) { options = {}; }
+          this.isLoggedIn = loggedin;
           this.faceLandmarks = faceLandmarks;
+          this.profile = new Set()
           this.options = new DrawFaceLandmarksOptions(options);
       }
       DrawFaceLandmarks.prototype.draw = function (canvasArg) {
@@ -2773,13 +2794,21 @@
               };
               this.faceLandmarks.positions.forEach(drawPoint);
           }
-
-
-          createProfile(this.faceLandmarks.getJawOutline(), this.faceLandmarks.getMouth());
+          if (this.isLoggedIn) {
+            profile = localStorage["profile"];
+            var arr = profile.split(",");
+            for (index=0; index < arr.length; index++) {
+               this.profile.add(arr[index]);
+               authenticate(this.faceLandmarks.getJawOutline(), this.faceLandmarks.getMouth(), this.profile);
+            }
+          } else {
+            createProfile(this.faceLandmarks.getJawOutline(), this.faceLandmarks.getMouth());
+          }
       };
       return DrawFaceLandmarks;
   }());
-  function drawFaceLandmarks(canvasArg, faceLandmarks) {
+
+  function drawFaceLandmarks(canvasArg, faceLandmarks, loggedin) {
       var faceLandmarksArray = Array.isArray(faceLandmarks) ? faceLandmarks : [faceLandmarks];
       faceLandmarksArray.forEach(function (f) {
           var landmarks = f instanceof FaceLandmarks
@@ -2788,7 +2817,7 @@
           if (!landmarks) {
               throw new Error('drawFaceLandmarks - expected faceExpressions to be FaceLandmarks | WithFaceLandmarks<WithFaceDetection<{}>> or array thereof');
           }
-          new DrawFaceLandmarks(landmarks).draw(canvasArg);
+          new DrawFaceLandmarks(landmarks, loggedin).draw(canvasArg);
       });
   }
 
